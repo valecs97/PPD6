@@ -1,0 +1,27 @@
+The O(n^2) is a plain matrix multiplication algorithm.
+
+I used FutureTask for poli multiplication in order to paralelize it.
+Unfortunetly it doesn't perform faster.
+I tried to use pool thread (without the multiplication being sincronized) but with the same
+result.
+
+The performance for N=1000 is 0ms for sequential and 7ms for parallelized.
+The performance for N=10000 is 11ms for sequential and 432ms for parallelized.
+
+
+
+
+
+
+
+
+The Karatsuba algorithm will take 2 bigintegers as parameters.
+It will calculate the max bit length of the 2. If the length is less than 2000 then it
+will return the multiplication.
+Then it will divide the N by 2 and round up.
+After that it will shift and substract and call recursive the results.
+
+I used FutureTask for Karatsuba in order to parallelize it.
+
+The performance for N=1000000 is 15ms for sequential and 13ms for parallelized.
+The performance for N=10000000 is 405ms for sequential and 375ms for parallelized.
