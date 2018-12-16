@@ -1,15 +1,40 @@
+import mpi.MPI;
+
 import java.math.BigInteger;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 public class Main {
+    private static int N = 100;
+/*    public static void main(String[] args) {
 
-    public static void main(String[] args) {
-        int N=10000;
-        //sequencialKaratsuba(N);
-        //paralelizedKaratsuba(N);
+        sequencialKaratsuba(N);
+        paralelizedKaratsuba(N);
         poliMulti(N,N);
         paralelizedPoliMulti(N,N);
+    }*/
+
+    public static void main(String[] args) {
+        MPI.Init(args);
+        int me = MPI.COMM_WORLD.Rank();
+        int size = MPI.COMM_WORLD.Size();
+
+        /*if (me == 0){
+            sequencialKaratsuba(N);
+            paralelizedKaratsuba(N);
+            mpiKaratsuba(N);
+        } else{
+            Karatsuba.karatsubaWorkerMPI(me);
+        }*/
+        if (me == 0){
+            poliMulti(N,N);
+            paralelizedPoliMulti(N,N);
+            poliMPI(N,N);
+        } else{
+            PoliMult.multiplyMPIWorker(me);
+        }
+
+        MPI.Finalize();
     }
 
     private static void poliMulti(int n,int m){
@@ -18,6 +43,16 @@ public class Main {
         int[] b = fill(m);
         start = System.currentTimeMillis();
         PoliMult.multiply(a,b,n,m);
+        stop = System.currentTimeMillis();
+        System.out.println((stop - start)/10 + " ms");
+    }
+
+    private static void poliMPI(int n,int m){
+        long start, stop;
+        int[] a = fill(n);
+        int[] b = fill(m);
+        start = System.currentTimeMillis();
+        PoliMult.multiplyMPI(a,b,n,m);
         stop = System.currentTimeMillis();
         System.out.println((stop - start)/10 + " ms");
     }
@@ -58,6 +93,22 @@ public class Main {
         //Async.executor.shutdown();
 
         //System.out.println((c.equals(d)));
+    }
+
+    private static void mpiKaratsuba(int N){
+        long start, stop;
+        Random random = new Random();
+        BigInteger a = new BigInteger(N, random);
+        BigInteger b = new BigInteger(N, random);
+
+        start = System.currentTimeMillis();
+        try {
+            Karatsuba.karatsubaMPI(a, b,1);
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        stop = System.currentTimeMillis();
+        System.out.println((stop - start)/10 + " ms");
     }
 
     private static void sequencialKaratsuba(int N){
